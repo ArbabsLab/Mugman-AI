@@ -10,6 +10,9 @@ WIN_WIDTH = 600
 WIN_HEIGHT = 800
 WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 
+GAME_SPEED = 20
+OBSTACLES = []
+
 class Mugman:
     IMGS = MUGMAN_IMGS
     X = 80
@@ -57,12 +60,12 @@ class Mugman:
         self.rect.y = self.Y
 
     def duck(self):
-        self.dino_rect = self.image.get_rect()
-        self.dino_rect.x = self.X
-        self.dino_rect.y = self.Y_DUCK
+        self.rect = self.image.get_rect()
+        self.rect.x = self.X
+        self.rect.y = self.Y_DUCK
     
     def jump(self):
-        if self.dino_jump:
+        if self.jump:
             self.rect.y -= self.jump_vel * 4
             self.jump_vel -= 0.8
         if self.jump_vel < - self.JUMP_VEL:
@@ -77,46 +80,16 @@ class Evilcup():
     GAP = 200
     VEL = 5
 
-    def __init__(self, x):
-        self.x = x
-        self.height = 0
+    def __init__(self, image):
+        self.image = image
+        self.rect = self.image[self.type].get_rect()
+        self.rect.x = WIN_WIDTH
+        self.rect.y = 325
 
-        self.top = 0
-        self.bottom = 0
+    def update(self):
+        self.rect.x -= GAME_SPEED
+        if self.rect.x < -self.rect.width:
+            OBSTACLES.pop()
 
-        self.PIPE_TOP = pygame.transform.flip(EVILCUP_IMGS, False, True)
-        self.PIPE_BOTTOM = EVILCUP_IMGS
-
-        self.passed = False
-
-        self.set_height()
-
-    def set_height(self):
-        self.height = random.randrange(50, 450)
-        self.top = self.height - self.PIPE_TOP.get_height()
-        self.bottom = self.height + self.GAP
-
-    def move(self):
-        self.x -= self.VEL
-
-    def draw(self, win):
-       
-        win.blit(self.PIPE_TOP, (self.x, self.top))
-        win.blit(self.PIPE_BOTTOM, (self.x, self.bottom))
-
-
-    def collide(self, bird, win):
-      
-        bird_mask = bird.get_mask()
-        top_mask = pygame.mask.from_surface(self.PIPE_TOP)
-        bottom_mask = pygame.mask.from_surface(self.PIPE_BOTTOM)
-        top_offset = (self.x - bird.x, self.top - round(bird.y))
-        bottom_offset = (self.x - bird.x, self.bottom - round(bird.y))
-
-        b_point = bird_mask.overlap(bottom_mask, bottom_offset)
-        t_point = bird_mask.overlap(top_mask,top_offset)
-
-        if b_point or t_point:
-            return True
-
-        return False
+    def draw(self, SCREEN):
+        SCREEN.blit(self.image[self.type], self.rect)
