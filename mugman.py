@@ -118,6 +118,19 @@ def main():
     obstacles = []
     death_count = 0
 
+    def score():
+        global points, game_speed
+        points += 1
+        if points % 100 == 0:
+            game_speed += 1
+
+        text = font.render("Points: " + str(points), True, (0, 0, 0))
+        textRect = text.get_rect()
+        textRect.center = (1000, 40)
+        WIN.blit(text, textRect)
+        
+
+
 
 
 def menu(death_count):
