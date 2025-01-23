@@ -10,6 +10,7 @@ WIN_WIDTH = 600
 WIN_HEIGHT = 800
 WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 
+
 GAME_SPEED = 20
 OBSTACLES = []
 
@@ -76,12 +77,9 @@ class Mugman:
         SCREEN.blit(self.image, (self.rect.x, self.rect.y))
 
 class Evilcup():
-  
-    GAP = 200
-    VEL = 5
-
-    def __init__(self, image):
+    def __init__(self, image, type):
         self.image = image
+        self.type = type
         self.rect = self.image[self.type].get_rect()
         self.rect.x = WIN_WIDTH
         self.rect.y = 325
@@ -93,3 +91,15 @@ class Evilcup():
 
     def draw(self, SCREEN):
         SCREEN.blit(self.image[self.type], self.rect)
+
+class Groundcup(Evilcup):
+    def __init__(self, image):
+        self.type = 0
+        super().__init__(image, self.type)
+        self.rect.y = 325
+
+class Flycup(Evilcup):
+    def __init__(self, image):
+        self.type = 0
+        super().__init__(image, self.type)
+        self.rect.y = 200
