@@ -28,4 +28,21 @@ class Mugman:
         self.height = self.y
 
     def move(self):
-        pass
+        self.tick_count += 1
+
+        dp = self.vel*self.tick_count + 0.5 * 3 * self.tick_count**2
+
+        if dp >= 16:
+            dp = (dp/abs(dp)) * 16
+        
+        if dp < 0:
+            dp -= 2
+        
+        self.y = self.y + dp
+
+        if dp < 0 or self.y < self.height + 50:  # tilt up
+            if self.tilt < self.MAX_ROTATION:
+                self.tilt = self.MAX_ROTATION
+        else: 
+            if self.tilt > -90:
+                self.tilt -= self.ROT_VEL
