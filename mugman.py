@@ -11,8 +11,7 @@ WIN_HEIGHT = 800
 WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 
 
-GAME_SPEED = 20
-OBSTACLES = []
+
 
 class Mugman:
     IMGS = MUGMAN_IMGS
@@ -103,3 +102,50 @@ class Flycup(Evilcup):
         self.type = 0
         super().__init__(image, self.type)
         self.rect.y = 200
+
+
+def main():
+
+    global game_speed, x_pos_bg, y_pos_bg, points, obstacles
+    run = True
+    clock = pygame.time.Clock()
+    player = Mugman()
+    game_speed = 20
+    x_pos_bg = 0
+    y_pos_bg = 380
+    points = 0
+    font = pygame.font.Font('freesansbold.ttf', 20)
+    obstacles = []
+    death_count = 0
+
+
+
+def menu(death_count):
+    global points
+    run = True
+    while run:
+        WIN.fill((255, 255, 255))
+        font = pygame.font.Font('freesansbold.ttf', 30)
+
+        if death_count == 0:
+            text = font.render("Press any Key to Start", True, (0, 0, 0))
+        elif death_count > 0:
+            text = font.render("Press any Key to Restart", True, (0, 0, 0))
+            score = font.render("Your Score: " + str(points), True, (0, 0, 0))
+            scoreRect = score.get_rect()
+            scoreRect.center = (WIN_WIDTH // 2, WIN_HEIGHT // 2 + 50)
+            WIN.blit(score, scoreRect)
+        textRect = text.get_rect()
+        textRect.center = (WIN_WIDTH // 2, WIN_HEIGHT // 2)
+        WIN.blit(text, textRect)
+        WIN.blit(MUGMAN_IMGS[0], (WIN_WIDTH // 2 - 20, WIN_HEIGHT // 2 - 140))
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                run = False
+            if event.type == pygame.KEYDOWN:
+                main()
+
+
+menu(death_count=0)
