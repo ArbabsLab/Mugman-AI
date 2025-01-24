@@ -4,8 +4,10 @@ import os
 
 pygame.init()
 
-MUGMAN_IMGS = [pygame.transform2x(pygame.image.load(os.path.join("assets", "mug1.png")))]
-EVILCUP_IMGS = [pygame.transform2x(pygame.image.load(os.path.join("assets", "evilcup1.png")))]
+MUGMAN_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join("assets", "mug1.png")))]
+EVILCUP_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join("assets", "evilcup1.png")))]
+BG = pygame.image.load(os.path.join("assets", "Track.png"))
+
 WIN_WIDTH = 600
 WIN_HEIGHT = 800
 WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
@@ -18,10 +20,10 @@ class Mugman:
     X = 80
     Y = 310
     Y_DUCK = 340
-    JUMP_VEL = 5
+    JUMP_VEL = 8.5
 
     def __init__(self):
-        self.image = self.IMGs[0]
+        self.image = self.IMGS[0]
         self.x = self.X
         self.y = self.Y
 
@@ -37,6 +39,13 @@ class Mugman:
         self.rect.y = self.Y
     
     def update(self, userInput):
+        if self.run_state:
+            self.run()
+        if self.duck_state:
+            self.duck()
+        if self.jump_state:
+            self.jump()
+        
         if self.step_index >= 10:
             self.step_index = 0
         
@@ -79,28 +88,26 @@ class Evilcup():
     def __init__(self, image, type):
         self.image = image
         self.type = type
-        self.rect = self.image[self.type].get_rect()
+        self.rect = self.image.get_rect()
         self.rect.x = WIN_WIDTH
         self.rect.y = 325
 
     def update(self):
-        self.rect.x -= GAME_SPEED
+        self.rect.x -= game_speed
         if self.rect.x < -self.rect.width:
-            OBSTACLES.pop()
+            obstacles.pop()
 
     def draw(self, SCREEN):
         SCREEN.blit(self.image[self.type], self.rect)
 
 class Groundcup(Evilcup):
     def __init__(self, image):
-        self.type = 0
-        super().__init__(image, self.type)
+        super().__init__(image)
         self.rect.y = 325
 
 class Flycup(Evilcup):
     def __init__(self, image):
-        self.type = 0
-        super().__init__(image, self.type)
+        super().__init__(image)
         self.rect.y = 200
 
 
@@ -128,8 +135,49 @@ def main():
         textRect = text.get_rect()
         textRect.center = (1000, 40)
         WIN.blit(text, textRect)
-        
 
+    def background():
+        global x_pos_bg, y_pos_bg
+        image_width = BG.get_width()
+        WIN.blit(BG, (x_pos_bg, y_pos_bg))
+        WIN.blit(BG, (image_width + x_pos_bg, y_pos_bg))
+        if x_pos_bg <= -image_width:
+            WIN.blit(BG, (image_width + x_pos_bg, y_pos_bg))
+            x_pos_bg = 0
+        x_pos_bg -= game_speed
+    
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+        
+        WIN.fill((255, 255, 255))
+        userInput = pygame.key.get_pressed()
+
+        player.draw(WIN)
+        player.update(userInput)
+
+        if len(obstacles) == 0:
+            ob = random.randint(0, 1)
+
+            if ob == 0:
+                obstacles.append(Groundcup(EVILCUP_IMGS[0]))
+            else:
+                obstacles.append(Flycup(EVILCUP_IMGS[0]))
+        
+        for obby in obstacles:
+            obby.draw(WIN)
+            obby.update()
+            if player.rect.colliderect(obby.rect):
+                pygame.time.delay(2000)
+                death_count += 1
+                menu(death_count)
+        
+        background()
+
+        score()
+        clock.tick(30)
+        pygame.display.update()
 
 
 
