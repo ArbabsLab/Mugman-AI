@@ -85,9 +85,8 @@ class Mugman:
         SCREEN.blit(self.image, (self.rect.x, self.rect.y))
 
 class Evilcup():
-    def __init__(self, image, type):
+    def __init__(self, image):
         self.image = image
-        self.type = type
         self.rect = self.image.get_rect()
         self.rect.x = WIN_WIDTH
         self.rect.y = 325
@@ -98,7 +97,7 @@ class Evilcup():
             obstacles.pop()
 
     def draw(self, SCREEN):
-        SCREEN.blit(self.image[self.type], self.rect)
+        SCREEN.blit(self.image, self.rect)
 
 class Groundcup(Evilcup):
     def __init__(self, image):
