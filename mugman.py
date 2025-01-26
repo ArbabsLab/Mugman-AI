@@ -11,23 +11,18 @@ def extract_sprites(sheet, sprite_width, sprite_height, start_x=0, start_y=0, co
     frames = []
     for row in range(rows):
         for col in range(columns):
-            x = start_x + col * (sprite_width + spacing_x)
+            x = start_x + col * (sprite_width + spacing_x) + 1
             y = start_y + row * (sprite_height + spacing_y)
             sprite = pygame.Surface((sprite_width, sprite_height), pygame.SRCALPHA)
             sprite.blit(sheet, (0, 0), (x, y, sprite_width, sprite_height))
             frames.append(sprite)
     return frames
 
-MUGMAN_RUN_FRAMES = extract_sprites(SPRITESHEET, 24, 24, start_x=10, start_y=50, columns=4, rows=1)
+MUGMAN_RUN_FRAMES = extract_sprites(SPRITESHEET, 24, 24, start_x=25, start_y=10, columns=3, rows=1)
+MUGMAN_JUMP_FRAMES = extract_sprites(SPRITESHEET, 32, 24, start_x=33, start_y=35, columns=1, rows=1)
+MUGMAN_DUCK_FRAMES = extract_sprites(SPRITESHEET, 24, 24, start_x=220, start_y=10, columns=1, rows=1)
 
-
-
-MUGMAN_JUMP_FRAMES = extract_sprites(SPRITESHEET, 32, 32, start_x=10, start_y=100, columns=1, rows=1)
-MUGMAN_DUCK_FRAMES = extract_sprites(SPRITESHEET, 32, 32, start_x=10, start_y=150, columns=2, rows=1)
-
-MUGMAN_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join("assets", "mug1.png")))]
-
-EVILCUP_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join("assets", "evilcup1.png")))]
+EVILCUP_IMGS = extract_sprites(SPRITESHEET, 24, 24, start_x=25, start_y=10, columns=3, rows=1)
 BG = pygame.image.load(os.path.join("assets", "game_track.png"))
 
 WIN_WIDTH = 600
@@ -38,23 +33,25 @@ WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 
 
 class Mugman:
-    IMGS = MUGMAN_IMGS
     X = 80
-    Y = 310
-    Y_DUCK = 340
+    Y = 370
+    Y_DUCK = 375
     JUMP_VEL = 8.5
 
     def __init__(self):
-        self.image = self.IMGS[0]
+        self.run_img = MUGMAN_RUN_FRAMES
+        self.duck_img = MUGMAN_DUCK_FRAMES
+        self.jump_img = MUGMAN_JUMP_FRAMES
+
+        self.image = self.run_img[0]
         self.x = self.X
         self.y = self.Y
 
-        #states
         self.run_state = True
         self.duck_state = False
         self.jump_state = False
 
-        self.step_index = 0
+        self.frame_index = 0
         self.jump_vel = self.JUMP_VEL
         self.rect = self.image.get_rect()
         self.rect.x = self.X
@@ -68,8 +65,8 @@ class Mugman:
         if self.jump_state:
             self.jump()
         
-        if self.step_index >= 10:
-            self.step_index = 0
+        if self.frame_index >= 3:
+            self.frame_index = 0
         
         if userInput[pygame.K_UP] and not self.jump_state:
             self.run_state = False
@@ -86,16 +83,20 @@ class Mugman:
 
 
     def run(self):
+        self.image = self.run_img[self.frame_index]
         self.rect = self.image.get_rect()
         self.rect.x = self.X
         self.rect.y = self.Y
+        self.frame_index += 1
 
     def duck(self):
+        self.image = self.duck_img[0]
         self.rect = self.image.get_rect()
         self.rect.x = self.X
         self.rect.y = self.Y_DUCK
     
     def jump(self):
+        self.image = self.jump_img[0]
         if self.jump:
             self.rect.y -= self.jump_vel * 4
             self.jump_vel -= 0.8
@@ -199,7 +200,7 @@ def main():
         
 
         score()
-        clock.tick(30)
+        clock.tick(10)
         pygame.display.update()
 
 

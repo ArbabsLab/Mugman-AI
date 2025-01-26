@@ -24,6 +24,18 @@ def extract_sprites(sheet, sprite_width, sprite_height, start_x=0, start_y=0, co
             frames.append(sprite)
     return frames
 
+def extract_ops(sheet, sprite_width, sprite_height, start_x=0, start_y=0, columns=1, rows=1, spacing_x=0, spacing_y=0):
+    frames = []
+    for row in range(rows):
+        for col in range(columns):
+            x = start_x + col * (sprite_width + spacing_x) + 1
+            y = start_y + row * (sprite_height + spacing_y)
+            sprite = pygame.Surface((sprite_width, sprite_height), pygame.SRCALPHA)
+            sprite.blit(sheet, (0, 0), (x, y, sprite_width, sprite_height))
+            sprite = pygame.transform.flip(sprite, 0, 1)
+            frames.append(sprite)
+    return frames
+
 # Extract animations for Mugman
 MUGMAN_RUN_FRAMES = extract_sprites(SPRITESHEET, 24, 24, start_x=25, start_y=10, columns=3, rows=1)
 MUGMAN_JUMP_FRAMES = extract_sprites(SPRITESHEET, 32, 24, start_x=33, start_y=35, columns=1, rows=1)
