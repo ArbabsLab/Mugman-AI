@@ -15,6 +15,21 @@ def extract_sprites(sheet, sprite_width, sprite_height, start_x=0, start_y=0, co
             y = start_y + row * (sprite_height + spacing_y)
             sprite = pygame.Surface((sprite_width, sprite_height), pygame.SRCALPHA)
             sprite.blit(sheet, (0, 0), (x, y, sprite_width, sprite_height))
+
+            sprite = pygame.transform.scale2x(sprite)
+            frames.append(sprite)
+    return frames
+
+def extract_ops(sheet, sprite_width, sprite_height, start_x=0, start_y=0, columns=1, rows=1, spacing_x=0, spacing_y=0):
+    frames = []
+    for row in range(rows):
+        for col in range(columns):
+            x = start_x + col * (sprite_width + spacing_x) + 1
+            y = start_y + row * (sprite_height + spacing_y)
+            sprite = pygame.Surface((sprite_width, sprite_height), pygame.SRCALPHA)
+            sprite.blit(sheet, (0, 0), (x, y, sprite_width, sprite_height))
+            sprite = pygame.transform.flip(sprite, 1, 0)
+            sprite = pygame.transform.scale2x(sprite)
             frames.append(sprite)
     return frames
 
@@ -22,7 +37,7 @@ MUGMAN_RUN_FRAMES = extract_sprites(SPRITESHEET, 24, 24, start_x=25, start_y=10,
 MUGMAN_JUMP_FRAMES = extract_sprites(SPRITESHEET, 32, 24, start_x=33, start_y=35, columns=1, rows=1)
 MUGMAN_DUCK_FRAMES = extract_sprites(SPRITESHEET, 24, 24, start_x=220, start_y=10, columns=1, rows=1)
 
-EVILCUP_IMGS = extract_sprites(SPRITESHEET, 24, 24, start_x=25, start_y=10, columns=3, rows=1)
+EVILCUP_IMGS = extract_ops(SPRITESHEET, 32, 32, start_x=0, start_y=220, columns=1, rows=1)
 BG = pygame.image.load(os.path.join("assets", "game_track.png"))
 
 WIN_WIDTH = 600
@@ -34,8 +49,8 @@ WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 
 class Mugman:
     X = 80
-    Y = 370
-    Y_DUCK = 375
+    Y = 360
+    Y_DUCK = 365
     JUMP_VEL = 8.5
 
     def __init__(self):
@@ -130,7 +145,7 @@ class Groundcup(Evilcup):
 class Flycup(Evilcup):
     def __init__(self, image):
         super().__init__(image)
-        self.rect.y = 200
+        self.rect.y = 300
 
 
 def main():
@@ -223,7 +238,7 @@ def menu(death_count):
         textRect = text.get_rect()
         textRect.center = (WIN_WIDTH // 2, WIN_HEIGHT // 2)
         WIN.blit(text, textRect)
-        WIN.blit(MUGMAN_IMGS[0], (WIN_WIDTH // 2 - 20, WIN_HEIGHT // 2 - 140))
+        WIN.blit(MUGMAN_RUN_FRAMES[0], (WIN_WIDTH // 2 - 20, WIN_HEIGHT // 2 - 140))
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
