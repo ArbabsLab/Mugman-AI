@@ -41,7 +41,7 @@ EVILCUP_IMGS = extract_ops(SPRITESHEET, 32, 32, start_x=0, start_y=220, columns=
 BG = pygame.image.load(os.path.join("assets", "game_track.png"))
 
 WIN_WIDTH = 600
-WIN_HEIGHT = 400
+WIN_HEIGHT = 500
 WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 
 
@@ -80,7 +80,7 @@ class Mugman:
         if self.jump_state:
             self.jump()
         
-        if self.frame_index >= 3:
+        if self.frame_index >= len(self.run_img):
             self.frame_index = 0
         
         if userInput[pygame.K_UP] and not self.jump_state:
@@ -169,9 +169,7 @@ def main():
             game_speed += 1
 
         text = font.render("Points: " + str(points), True, (0, 0, 0))
-        textRect = text.get_rect()
-        textRect.center = (1000, 40)
-        WIN.blit(text, textRect)
+        WIN.blit(text, (500, 40))
 
     def background():
         global x_pos_bg, y_pos_bg
