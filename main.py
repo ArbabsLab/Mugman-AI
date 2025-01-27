@@ -157,7 +157,7 @@ class Flycup(Evilcup):
 
 
 def eval_genomes(genomes, config):
-    global game_speed, x_pos_bg, y_pos_bg, points, obstacles, player, ge, nets
+    global gen, game_speed, x_pos_bg, y_pos_bg, points, obstacles, player, ge, nets
     run = True
     clock = pygame.time.Clock()
 
@@ -165,6 +165,7 @@ def eval_genomes(genomes, config):
     player = []
     ge = []
     nets = []
+    gen = 0
 
     game_speed = 20
     x_pos_bg = 0
@@ -198,10 +199,18 @@ def eval_genomes(genomes, config):
             x_pos_bg = 0
         x_pos_bg -= game_speed
 
+    def stats(generations):
+        global ge
+        aliveCount = font.render(f"Mugman Count: {len(player)}", True, (0,0,0))
+        genCount = font.render(f"Generation: {pop.generation+1}", True, (0,0,0))
+
+        WIN.blit(aliveCount, (WIN_WIDTH // 2, 20))
+        WIN.blit(genCount, (WIN_WIDTH // 2, 60))
+    
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                pygame.quit()
 
         WIN.fill((255, 255, 255))
         background()
@@ -236,12 +245,14 @@ def eval_genomes(genomes, config):
                 mugman.run_state = False
 
         score()
+        stats(gen)
         background()
-        clock.tick(10)
+        clock.tick(30)
         pygame.display.update()
 
 
 def run(config_file):
+    global pop
     config = neat.config.Config(
         neat.DefaultGenome,
         neat.DefaultReproduction,
@@ -251,7 +262,7 @@ def run(config_file):
     )
 
     pop = neat.Population(config)
-    pop.run(eval_genomes, 50)
+    pop.run(eval_genomes, 100)
 
 
 if __name__ == "__main__":
