@@ -89,6 +89,8 @@ class Mugman:
     def update(self, userInput):
         if self.run_state:
             self.run()
+        if self.jump_state:
+            self.jump()
         if self.duck_state:
             self.duck()
         if self.jump_state:
@@ -96,6 +98,18 @@ class Mugman:
 
         if self.frame_index >= len(self.run_img):
             self.frame_index = 0
+        
+        if userInput[pygame.K_DOWN] and not self.jump_state:
+            self.duck_state = True
+            self.run_state = False
+            self.jump_state = False
+        elif userInput[pygame.K_UP] and not self.jump_state:
+            self.jump_state = True
+            self.duck_state = False
+            self.run_state = False
+        else:
+            self.run_state = not self.jump_state
+            self.duck_state = False
 
     def run(self):
         self.image = self.run_img[self.frame_index]
@@ -141,7 +155,6 @@ class Evilcup:
         pygame.draw.rect(SCREEN, self.color, (self.rect.x, self.rect.y, self.rect.width, self.rect.height), 2)
         for obstacle in obstacles:
             pygame.draw.line(SCREEN, self.color, (self.rect.x + 54, self.rect.y + 12), obstacle.rect.center, 2)
-
 
 
 class Groundcup(Evilcup):
@@ -223,7 +236,7 @@ def eval_genomes(genomes, config):
             break
 
         if len(obstacles) == 0:
-            ob = 0
+            ob = random.choice([0, 1])
 
             if ob == 0:
                 obstacles.append(Groundcup(EVILCUP_IMGS[0]))
@@ -239,15 +252,29 @@ def eval_genomes(genomes, config):
                     remove(i)
 
         for i, mugman in enumerate(player):
-            output = nets[i].activate((mugman.rect.y, distance((mugman.rect.x, mugman.rect.y), obby.rect.midtop)))
+            ge[i].fitness += 0.1  
+
+            output = nets[i].activate((
+                mugman.rect.y, 
+                distance((mugman.rect.x, mugman.rect.y), obby.rect.midtop)
+            ))
+
             if output[0] > 0.5 and mugman.rect.y == Mugman.Y:
                 mugman.jump_state = True
                 mugman.run_state = False
+                ge[i].fitness += 1  
+            elif output[1] > 0.5 and not mugman.jump_state:
+                mugman.duck_state = True
+                mugman.run_state = False
+                ge[i].fitness += 1 
+            else:
+                mugman.run_state = True
+                mugman.duck_state = False
+
 
         score()
         stats(gen)
-        background()
-        clock.tick(30)
+        clock.tick(10)
         pygame.display.update()
 
 
@@ -262,7 +289,7 @@ def run(config_file):
     )
 
     pop = neat.Population(config)
-    pop.run(eval_genomes, 100)
+    pop.run(eval_genomes, 50)
 
 
 if __name__ == "__main__":
